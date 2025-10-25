@@ -84,12 +84,12 @@ function _getCurrentPage(url) {
 }
 
 // Create a wrapper component that uses useLocation inside the Router context
-function PagesContent() {
+function PagesContent({ onLogout }) {
     const location = useLocation();
     const currentPage = _getCurrentPage(location.pathname);
     
     return (
-        <Layout currentPageName={currentPage}>
+        <Layout currentPageName={currentPage} onLogout={onLogout}>
             <Routes>            
                 
                     <Route path="/" element={<Dashboard />} />
@@ -132,10 +132,10 @@ function PagesContent() {
     );
 }
 
-export default function Pages() {
+export default function Pages({ onLogout }) {
     return (
         <Router>
-            <PagesContent />
+            <PagesContent onLogout={onLogout} />
         </Router>
     );
 }

@@ -59,11 +59,10 @@ const navigationItems = [
   { title: "Mensalidade de Uso", url: createPageUrl("Mensalidade"), icon: CreditCard },
 ];
 
-export default function Layout({ children, currentPageName }) {
-  const { data: user, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me().catch(() => null),
-  });
+export default function Layout({ children, currentPageName, onLogout }) {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const user = currentUser;
+  const isLoadingUser = false;
 
   const isAdmin = user?.role === 'admin';
   const [notifications, setNotifications] = useState([]);
@@ -145,7 +144,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-slate-100">
+      <div className="flex min-h-screen w-full bg-slate-100">
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center gap-3 px-3">
@@ -187,26 +186,26 @@ export default function Layout({ children, currentPageName }) {
            <SidebarFooter>
               <div className="flex items-center gap-3 p-3 border-t">
                 <div className="w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                  {user?.full_name ? user.full_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : '')}
+                  {user?.fullName ? user.fullName.charAt(0).toUpperCase() : (user?.full_name ? user.full_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : ''))}
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-semibold truncate text-slate-800">{user?.full_name || 'Usuário'}</p>
+                  <p className="text-sm font-semibold truncate text-slate-800">{user?.fullName || user?.full_name || 'Usuário'}</p>
                   <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => base44.auth.logout()} aria-label="Sair">
+                <Button variant="ghost" size="icon" onClick={onLogout} aria-label="Sair">
                   <LogOut className="w-5 h-5 text-slate-600" />
                 </Button>
               </div>
            </SidebarFooter>
         </Sidebar>
 
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col min-h-screen w-full">
           <header className="flex items-center justify-between p-4 bg-white border-b lg:justify-end">
             <SidebarTrigger className="lg:hidden">
               <Menu className="w-6 h-6" />
             </SidebarTrigger>
           </header>
-          <div className="flex-1 overflow-x-hidden overflow-y-auto">
+          <div className="flex-1 w-full">
             {children}
             <Toaster />
           </div>
