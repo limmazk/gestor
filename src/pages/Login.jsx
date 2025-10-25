@@ -61,7 +61,7 @@ export default function Login({ onLogin }) {
       return;
     }
 
-    if (registerData.password.length < 6) {
+    if (registerData.password.length < 6) {     
       toast({
         title: "Erro no cadastro",
         description: "A senha deve ter pelo menos 6 caracteres",
