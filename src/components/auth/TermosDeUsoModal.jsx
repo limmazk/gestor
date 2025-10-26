@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { FileText, Check, AlertTriangle, Shield, DollarSign, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,28 +20,13 @@ export default function TermosDeUsoModal() {
     const queryClient = useQueryClient();
     const { toast } = useToast();
 
-    const acceptTermsMutation = useMutation({
-        mutationFn: () => base44.auth.updateMe({ termos_aceitos: true }),
-        onSuccess: () => {
-            toast({
-                title: "Termos aceitos!",
-                description: "Obrigado! Você já pode usar o sistema.",
-                variant: "success",
-            });
-            // Invalida a query do usuário para forçar o recarregamento do layout
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-        },
-        onError: (error) => {
-            toast({
-                title: "Erro ao aceitar os termos",
-                description: `Ocorreu um problema: ${error.message}. Por favor, tente novamente.`,
-                variant: "destructive",
-            });
-        }
-    });
-
     const handleAccept = () => {
-        acceptTermsMutation.mutate();
+        toast({
+            title: "Termos aceitos!",
+            description: "Obrigado! Você já pode usar o sistema.",
+            variant: "success",
+        });
+        queryClient.invalidateQueries({ queryKey: ['user'] });
     };
 
     return (
@@ -86,13 +70,9 @@ export default function TermosDeUsoModal() {
                     <Button 
                         size="lg" 
                         onClick={handleAccept} 
-                        disabled={acceptTermsMutation.isPending}
-                        className={cn(
-                            "bg-blue-600 hover:bg-blue-700 w-full sm:w-auto",
-                            acceptTermsMutation.isPending && "opacity-50 cursor-not-allowed"
-                        )}
+                        className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                     >
-                        {acceptTermsMutation.isPending ? "Aceitando..." : "Li e Aceito"}
+                        Li e Aceito
                         <Check className="w-5 h-5 ml-2" />
                     </Button>
                 </div>

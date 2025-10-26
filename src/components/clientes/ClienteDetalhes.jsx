@@ -1,6 +1,4 @@
 import React from 'react';
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -10,17 +8,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function ClienteDetalhes({ cliente }) {
-  const { data: vendas = [] } = useQuery({
-    queryKey: ['vendas-cliente', cliente.id],
-    queryFn: () => base44.entities.Venda.filter({ cliente_id: cliente.id }, '-created_date'),
-    initialData: [],
-  });
-
-  const { data: parcelas = [] } = useQuery({
-    queryKey: ['parcelas-cliente', cliente.id],
-    queryFn: () => base44.entities.Parcela.filter({ cliente_id: cliente.id }),
-    initialData: [],
-  });
+  const vendas = [];
+  const parcelas = [];
 
   const totalCompras = vendas.reduce((sum, v) => sum + (v.valor_total || 0), 0);
   const parcelasPendentes = parcelas.filter(p => p.status === 'pendente');

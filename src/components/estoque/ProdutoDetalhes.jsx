@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,13 +18,8 @@ const DetailItem = ({ label, value, className = "" }) => (
 );
 
 const MovimentacaoEstoque = ({ produtoId }) => {
-    const { data: movimentacoes, isLoading } = useQuery({
-        queryKey: ['movimentacaoEstoque', produtoId],
-        queryFn: () => base44.entities.MovimentacaoEstoque.filter({ produto_id: produtoId }, '-created_date'),
-        enabled: !!produtoId,
-    });
-
-    if (isLoading) return <p className="text-center py-4">Carregando histórico...</p>;
+    const movimentacoes = [];
+    const isLoading = false;
 
     return (
         <div className="mt-4 space-y-3">

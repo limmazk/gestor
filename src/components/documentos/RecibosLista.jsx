@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Adicionado
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -11,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Receipt, Plus, Search, Eye, Calendar } from "lucide-react"; // Adicionado Search
+import { Receipt, Plus, Search, Eye, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -21,26 +19,14 @@ import ReciboDetalhes from "./ReciboDetalhes";
 export default function RecibosLista() {
   const [showForm, setShowForm] = useState(false);
   const [selectedRecibo, setSelectedRecibo] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // Adicionado estado de busca
-  
-  const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: recibos = [], isLoading } = useQuery({
-    queryKey: ['recibos'],
-    queryFn: () => base44.entities.Recibo.list('-created_date'),
-    initialData: [],
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Recibo.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recibos'] });
-      setShowForm(false);
-    },
-  });
+  const recibos = [];
+  const isLoading = false;
 
   const handleSubmit = (data) => {
-    createMutation.mutate(data);
+    console.log('Recibo submission temporarily disabled', data);
+    setShowForm(false);
   };
 
   // Lógica de filtro adicionada
@@ -153,7 +139,7 @@ export default function RecibosLista() {
           <ReciboForm
             onSubmit={handleSubmit}
             onCancel={() => setShowForm(false)}
-            isLoading={createMutation.isPending}
+            isLoading={false}
           />
         </DialogContent>
       </Dialog>

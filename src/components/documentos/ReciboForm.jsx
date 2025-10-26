@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,11 +22,7 @@ export default function ReciboForm({ onSubmit, onCancel, isLoading }) {
     observacoes: ''
   });
 
-  const { data: parcelas = [] } = useQuery({
-    queryKey: ['parcelas'],
-    queryFn: () => base44.entities.Parcela.filter({ status: 'pago' }),
-    initialData: [],
-  });
+  const parcelas = [];
 
   const handleParcelaSelect = (id) => {
     setParcelaId(id);

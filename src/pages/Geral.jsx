@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,13 +20,16 @@ export default function Geral() {
     const [cart, setCart] = useState([]);
     const [productSearch, setProductSearch] = useState('');
 
-    const { data: user } = useQuery({ queryKey: ['user'], queryFn: () => base44.auth.me() });
-    const { data: products = [] } = useQuery({ queryKey: ['produtosParaVenda'], queryFn: () => base44.entities.Produto.list() });
-    const { data: clients = [] } = useQuery({
-        queryKey: ['clientesParaVenda', clientQuery],
-        queryFn: () => clientQuery ? base44.entities.Cliente.filter({ name: { contains: clientQuery } }) : base44.entities.Cliente.list(null, 10),
-        enabled: !selectedClient
-    });
+    // const { data: user } = useQuery({ queryKey: ['user'], queryFn: () => base44.auth.me() });
+    const user = null;
+    // const { data: products = [] } = useQuery({ queryKey: ['produtosParaVenda'], queryFn: () => base44.entities.Produto.list() });
+    const products = [];
+    // const { data: clients = [] } = useQuery({
+    //     queryKey: ['clientesParaVenda', clientQuery],
+    //     queryFn: () => clientQuery ? base44.entities.Cliente.filter({ name: { contains: clientQuery } }) : base44.entities.Cliente.list(null, 10),
+    //     enabled: !selectedClient
+    // });
+    const clients = [];
 
     useEffect(() => {
         // Foca no input de produto apenas quando a tela de venda ativa estiver visível
@@ -36,26 +38,27 @@ export default function Geral() {
         }
     }, [cart, selectedClient]);
 
-    const addSaleMutation = useMutation({
-        mutationFn: (newSale) => base44.entities.Venda.create(newSale),
-        onSuccess: async (data) => {
-            const stockUpdatePromises = data.itens.map(item => {
-                const product = products.find(p => p.id === item.produto_id);
-                if (product && typeof product.quantidade_estoque === 'number') {
-                    return base44.entities.Produto.update(product.id, { quantidade_estoque: product.quantidade_estoque - item.quantidade });
-                }
-                return Promise.resolve();
-            });
-            await Promise.all(stockUpdatePromises);
+    // const addSaleMutation = useMutation({
+    //     mutationFn: (newSale) => base44.entities.Venda.create(newSale),
+    //     onSuccess: async (data) => {
+    //         const stockUpdatePromises = data.itens.map(item => {
+    //             const product = products.find(p => p.id === item.produto_id);
+    //             if (product && typeof product.quantidade_estoque === 'number') {
+    //                 return base44.entities.Produto.update(product.id, { quantidade_estoque: product.quantidade_estoque - item.quantidade });
+    //             }
+    //             return Promise.resolve();
+    //         });
+    //         await Promise.all(stockUpdatePromises);
 
-            queryClient.invalidateQueries({ queryKey: ['produtos'] });
-            queryClient.invalidateQueries({ queryKey: ['vendas', 'todasAsVendas', 'dashboard', 'parcelas'] });
+    //         queryClient.invalidateQueries({ queryKey: ['produtos'] });
+    //         queryClient.invalidateQueries({ queryKey: ['vendas', 'todasAsVendas', 'dashboard', 'parcelas'] });
             
-            toast({ title: "Venda Finalizada!", description: "Venda registrada e estoque atualizado.", variant: "success" });
-            handleCancelSale();
-        },
-        onError: (error) => toast({ title: "Erro ao finalizar venda", description: error.message, variant: "destructive" })
-    });
+    //         toast({ title: "Venda Finalizada!", description: "Venda registrada e estoque atualizado.", variant: "success" });
+    //         handleCancelSale();
+    //     },
+    //     onError: (error) => toast({ title: "Erro ao finalizar venda", description: error.message, variant: "destructive" })
+    // });
+    const addSaleMutation = { mutate: () => {}, isPending: false };
 
     const addToCart = (product, qty = 1) => {
         if (!product || (product.quantidade_estoque || 0) <= 0) {

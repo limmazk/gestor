@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,35 +42,39 @@ export default function Estoque() {
   const [query, setQuery] = useState('');
   const [isImportOpen, setIsImportOpen] = useState(false);
 
-  const { data: products = [], isLoading } = useQuery({
-    queryKey: ['produtos'],
-    queryFn: () => base44.entities.Produto.list('-created_date'),
-    initialData: []
-  });
+  // const { data: products = [], isLoading } = useQuery({
+  //   queryKey: ['produtos'],
+  //   queryFn: () => base44.entities.Produto.list('-created_date'),
+  //   initialData: []
+  // });
+  const products = [];
+  const isLoading = false;
 
-  const createProductMutation = useMutation({
-    mutationFn: (newProduct) => base44.entities.Produto.create(newProduct),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
-      queryClient.invalidateQueries({ queryKey: ['produtosParaVenda'] });
-      toast({
-        title: "Sucesso!",
-        description: `Produto "${form.nome_produto}" adicionado.`,
-        variant: "success",
-      });
-      setForm({ nome_produto: '', sku: '', codigo_barras: '', preco_venda: '', quantidade_estoque: '' });
-    },
-    onError: (error) => toast({ title: "Erro", description: error.message, variant: "destructive" })
-  });
+  // const createProductMutation = useMutation({
+  //   mutationFn: (newProduct) => base44.entities.Produto.create(newProduct),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['produtos'] });
+  //     queryClient.invalidateQueries({ queryKey: ['produtosParaVenda'] });
+  //     toast({
+  //       title: "Sucesso!",
+  //       description: `Produto "${form.nome_produto}" adicionado.`,
+  //       variant: "success",
+  //     });
+  //     setForm({ nome_produto: '', sku: '', codigo_barras: '', preco_venda: '', quantidade_estoque: '' });
+  //   },
+  //   onError: (error) => toast({ title: "Erro", description: error.message, variant: "destructive" })
+  // });
+  const createProductMutation = { mutate: () => {}, isPending: false };
 
-  const updateProductMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Produto.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
-      queryClient.invalidateQueries({ queryKey: ['produtosParaVenda'] });
-    },
-    onError: (error) => toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" })
-  });
+  // const updateProductMutation = useMutation({
+  //   mutationFn: ({ id, data }) => base44.entities.Produto.update(id, data),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['produtos'] });
+  //     queryClient.invalidateQueries({ queryKey: ['produtosParaVenda'] });
+  //   },
+  //   onError: (error) => toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" })
+  // });
+  const updateProductMutation = { mutate: () => {}, isPending: false };
   
   function handleAdd(e) {
     e.preventDefault();

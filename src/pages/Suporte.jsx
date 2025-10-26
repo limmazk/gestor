@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,16 +44,18 @@ export default function Suporte() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  // const { data: user } = useQuery({
+  //   queryKey: ['user'],
+  //   queryFn: () => base44.auth.me(),
+  // });
+  const user = null;
 
-  // REATIVADO: Busca pelas configurações públicas que são visíveis a todos os usuários.
-  const { data: configsArray, isLoading: isLoadingConfigs } = useQuery({
-    queryKey: ["configuracoesPublicas"],
-    queryFn: () => base44.entities.ConfiguracaoPublica.list(),
-  });
+  // const { data: configsArray, isLoading: isLoadingConfigs } = useQuery({
+  //   queryKey: ["configuracoesPublicas"],
+  //   queryFn: () => base44.entities.ConfiguracaoPublica.list(),
+  // });
+  const configsArray = [];
+  const isLoadingConfigs = false;
   const configs = mapConfigsToObject(configsArray || []);
   
   // Valores de contato agora são dinâmicos e públicos.
@@ -70,26 +71,27 @@ export default function Suporte() {
     }
   }, [user]);
 
-  const createTicketMutation = useMutation({
-    mutationFn: (ticketData) => base44.entities.SuporteTicket.create(ticketData),
-    onSuccess: () => {
-      toast({
-        title: "Ticket Enviado com Sucesso!",
-        description: "Nossa equipe de suporte responderá o mais breve possível.",
-        variant: "success",
-      });
-      setAssunto("");
-      setMensagem("");
-    },
-    onError: (error) => {
-      console.error("Error creating ticket:", error);
-      toast({
-        title: "Erro ao Enviar Ticket",
-        description: "Houve um problema ao registrar sua solicitação. Tente novamente.",
-        variant: "destructive",
-      });
-    }
-  });
+  // const createTicketMutation = useMutation({
+  //   mutationFn: (ticketData) => base44.entities.SuporteTicket.create(ticketData),
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Ticket Enviado com Sucesso!",
+  //       description: "Nossa equipe de suporte responderá o mais breve possível.",
+  //       variant: "success",
+  //     });
+  //     setAssunto("");
+  //     setMensagem("");
+  //   },
+  //   onError: (error) => {
+  //     console.error("Error creating ticket:", error);
+  //     toast({
+  //       title: "Erro ao Enviar Ticket",
+  //       description: "Houve um problema ao registrar sua solicitação. Tente novamente.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // });
+  const createTicketMutation = { mutate: () => {}, isPending: false };
 
   const handleEnviarTicket = async (e) => {
     e.preventDefault();

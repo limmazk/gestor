@@ -1,7 +1,5 @@
 
 import React, { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Users, DollarSign, ShoppingCart, Trophy, TrendingDown, BarChart, Star, Package } from 'lucide-react';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -21,30 +19,11 @@ const StatCard = ({ title, value, icon: Icon, description }) => (
 );
 
 export default function AdminDashboardTab() {
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['allUsersAdmin'],
-    queryFn: () => base44.entities.User.list(),
-  });
-
-  const { data: allVendas = [] } = useQuery({
-    queryKey: ["allVendasAdmin"],
-    queryFn: () => base44.entities.Venda.list(), // Fetches all sales data
-  });
-  
-  const { data: allClientes = [] } = useQuery({
-    queryKey: ["adminDashboardClients"], // RENOMEADO: Isola esta query do resto do sistema.
-    queryFn: () => base44.entities.Cliente.list(), // Fetches all client data
-  });
-
-  const { data: allProducts = [] } = useQuery({
-    queryKey: ["allProductsAdmin"],
-    queryFn: () => base44.entities.Produto.list(), // Fetches all product data
-  });
-
-  const { data: allPayments = [] } = useQuery({
-    queryKey: ['allPaymentsAdmin'],
-    queryFn: () => base44.entities.Pagamento.list(),
-  });
+  const allUsers = [];
+  const allVendas = [];
+  const allClientes = [];
+  const allProducts = [];
+  const allPayments = [];
 
   const stats = useMemo(() => {
     // Return early if essential data is not available

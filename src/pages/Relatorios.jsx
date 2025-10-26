@@ -1,6 +1,5 @@
 
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,30 +22,31 @@ export default function Relatorios() {
     if (!tipoRelatorio) return;
     setIsLoading(true);
     let data = [];
-    try {
-      switch (tipoRelatorio) {
-        case "vendas_mes":
-          data = await base44.entities.Venda.list("-data_venda", 100);
-          break;
-        case "clientes_ativos":
-          data = await base44.entities.Cliente.filter({ status: 'ativo' });
-          break;
-        case "produtos_mais_vendidos":
-          // This is a complex query, for now we list all products
-          data = await base44.entities.Produto.list();
-          break;
-        case "parcelas_atrasadas":
-          data = await base44.entities.Parcela.filter({ status: 'atrasado' });
-          break;
-        default:
-          break;
-      }
-      setDadosRelatorio(data);
-    } catch (error) {
-      console.error("Erro ao gerar relatório:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    // try {
+    //   switch (tipoRelatorio) {
+    //     case "vendas_mes":
+    //       data = await base44.entities.Venda.list("-data_venda", 100);
+    //       break;
+    //     case "clientes_ativos":
+    //       data = await base44.entities.Cliente.filter({ status: 'ativo' });
+    //       break;
+    //     case "produtos_mais_vendidos":
+    //       data = await base44.entities.Produto.list();
+    //       break;
+    //     case "parcelas_atrasadas":
+    //       data = await base44.entities.Parcela.filter({ status: 'atrasado' });
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    //   setDadosRelatorio(data);
+    // } catch (error) {
+    //   console.error("Erro ao gerar relatório:", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
+    setDadosRelatorio(data);
+    setIsLoading(false);
   };
 
   const renderRelatorio = () => {

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,26 +21,11 @@ export default function VendaForm({ onSubmit, onCancel, isLoading, scannedProduc
   const [itens, setItens] = useState([]);
   const [observacoes, setObservacoes] = useState('');
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-    staleTime: Infinity,
-  });
-
-  const { data: clientes = [], isLoading: isLoadingClientes } = useQuery({
-    queryKey: ['allClientes', user?.id], 
-    queryFn: () => base44.entities.Cliente.filter({ created_by: user.email }),
-    initialData: [],
-    staleTime: 1000 * 60 * 15,
-    enabled: !!user,
-  });
-
-  const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery({
-    queryKey: ['produtos', user?.id],
-    queryFn: () => base44.entities.Produto.filter({ created_by: user.email }),
-    initialData: [],
-    enabled: !!user,
-  });
+  const user = null;
+  const clientes = [];
+  const isLoadingClientes = false;
+  const produtos = [];
+  const isLoadingProdutos = false;
 
   useEffect(() => {
     if (scannedProduct && produtos.length > 0) {

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,40 +11,41 @@ export default function ConfiguracoesEmpresa() {
     const { toast } = useToast();
     const fileInputRef = useRef(null);
 
-    const { data: user, isLoading: isLoadingUser } = useQuery({
-        queryKey: ['user'],
-        queryFn: () => base44.auth.me(),
-    });
+    // const { data: user, isLoading: isLoadingUser } = useQuery({
+    //     queryKey: ['user'],
+    //     queryFn: () => base44.auth.me(),
+    // });
+    const user = null;
+    const isLoadingUser = false;
 
-    const uploadMutation = useMutation({
-        mutationFn: async (file) => {
-            if (!file) throw new Error("Nenhum arquivo selecionado.");
+    // const uploadMutation = useMutation({
+    //     mutationFn: async (file) => {
+    //         if (!file) throw new Error("Nenhum arquivo selecionado.");
             
-            // 1. Upload do arquivo
-            const { file_url } = await base44.integrations.Core.UploadFile({ file });
-            if (!file_url) throw new Error("Falha no upload do arquivo.");
+    //         const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    //         if (!file_url) throw new Error("Falha no upload do arquivo.");
 
-            // 2. Atualiza o perfil do usuário com a URL da logo
-            await base44.auth.updateMe({ logo_url: file_url });
+    //         await base44.auth.updateMe({ logo_url: file_url });
 
-            return file_url;
-        },
-        onSuccess: () => {
-            toast({
-                title: "Sucesso!",
-                description: "Sua logo foi atualizada.",
-                variant: "success",
-            });
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-        },
-        onError: (error) => {
-            toast({
-                title: "Erro ao atualizar logo",
-                description: error.message,
-                variant: "destructive",
-            });
-        }
-    });
+    //         return file_url;
+    //     },
+    //     onSuccess: () => {
+    //         toast({
+    //             title: "Sucesso!",
+    //             description: "Sua logo foi atualizada.",
+    //             variant: "success",
+    //         });
+    //         queryClient.invalidateQueries({ queryKey: ['user'] });
+    //     },
+    //     onError: (error) => {
+    //         toast({
+    //             title: "Erro ao atualizar logo",
+    //             description: error.message,
+    //             variant: "destructive",
+    //         });
+    //     }
+    // });
+    const uploadMutation = { mutate: () => {}, isPending: false };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];

@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, CreditCard, MessageSquare, LogOut } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
 
 export default function BloqueioMensalidade() {
   return (
@@ -34,7 +33,7 @@ export default function BloqueioMensalidade() {
             size="lg"
             variant="ghost"
             className="w-full text-slate-600"
-            onClick={() => base44.auth.logout()}
+            onClick={() => window.location.reload()}
           >
             <LogOut className="w-5 h-5 mr-2" />
             Sair e tentar novamente

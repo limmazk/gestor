@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,25 +20,13 @@ export default function NotasLista() {
   const [showForm, setShowForm] = useState(false);
   const [selectedNota, setSelectedNota] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const queryClient = useQueryClient();
 
-  const { data: notas = [], isLoading } = useQuery({
-    queryKey: ['notas'],
-    queryFn: () => base44.entities.NotaServico.list('-created_date'),
-    initialData: [],
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.NotaServico.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas'] });
-      setShowForm(false);
-    },
-  });
+  const notas = [];
+  const isLoading = false;
 
   const handleSubmit = (data) => {
-    createMutation.mutate(data);
+    console.log('Nota submission temporarily disabled', data);
+    setShowForm(false);
   };
 
   const filteredNotas = notas.filter(nota =>
@@ -166,7 +152,7 @@ export default function NotasLista() {
           <NotaForm
             onSubmit={handleSubmit}
             onCancel={() => setShowForm(false)}
-            isLoading={createMutation.isPending}
+            isLoading={false}
           />
         </DialogContent>
       </Dialog>

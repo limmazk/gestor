@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,24 +19,29 @@ export default function ChatAdmin() {
     const queryParams = new URLSearchParams(location.search);
     const conversaId = queryParams.get('conversaId');
 
-    const { data: adminUser } = useQuery({
-        queryKey: ['user'],
-        queryFn: () => base44.auth.me(),
-        staleTime: Infinity,
-    });
+    // const { data: adminUser } = useQuery({
+    //     queryKey: ['user'],
+    //     queryFn: () => base44.auth.me(),
+    //     staleTime: Infinity,
+    // });
+    const adminUser = null;
     
-    const { data: conversa, isLoading: isLoadingConversa } = useQuery({
-        queryKey: ['chatConversa', conversaId],
-        queryFn: () => base44.entities.ChatConversa.get(conversaId),
-        enabled: !!conversaId,
-    });
+    // const { data: conversa, isLoading: isLoadingConversa } = useQuery({
+    //     queryKey: ['chatConversa', conversaId],
+    //     queryFn: () => base44.entities.ChatConversa.get(conversaId),
+    //     enabled: !!conversaId,
+    // });
+    const conversa = null;
+    const isLoadingConversa = false;
 
-    const { data: messages = [], isLoading: isLoadingMessages } = useQuery({
-        queryKey: ['chatMessages', conversaId],
-        queryFn: () => base44.entities.ChatMessage.filter({ conversa_id: conversaId }, 'created_date'),
-        enabled: !!conversaId,
-        refetchInterval: 5000, 
-    });
+    // const { data: messages = [], isLoading: isLoadingMessages } = useQuery({
+    //     queryKey: ['chatMessages', conversaId],
+    //     queryFn: () => base44.entities.ChatMessage.filter({ conversa_id: conversaId }, 'created_date'),
+    //     enabled: !!conversaId,
+    //     refetchInterval: 5000, 
+    // });
+    const messages = [];
+    const isLoadingMessages = false;
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -47,38 +51,38 @@ export default function ChatAdmin() {
         scrollToBottom();
     }, [messages]);
 
-    // Mark conversation as read by admin when component mounts
-    useEffect(() => {
-        if (conversa && conversa.unread_admin) {
-            base44.entities.ChatConversa.update(conversaId, { unread_admin: false }).then(() => {
-                queryClient.invalidateQueries({ queryKey: ['adminNotifications'] });
-                queryClient.invalidateQueries({ queryKey: ['openChatsAdmin'] });
-            });
-        }
-    }, [conversa, conversaId, queryClient]);
+    // useEffect(() => {
+    //     if (conversa && conversa.unread_admin) {
+    //         base44.entities.ChatConversa.update(conversaId, { unread_admin: false }).then(() => {
+    //             queryClient.invalidateQueries({ queryKey: ['adminNotifications'] });
+    //             queryClient.invalidateQueries({ queryKey: ['openChatsAdmin'] });
+    //         });
+    //     }
+    // }, [conversa, conversaId, queryClient]);
 
-    const sendMessageMutation = useMutation({
-        mutationFn: async (messageContent) => {
-            await base44.entities.ChatMessage.create({
-                conversa_id: conversaId,
-                remetente_id: 'admin',
-                remetente_nome: adminUser?.full_name || 'Admin',
-                conteudo: messageContent,
-            });
+    // const sendMessageMutation = useMutation({
+    //     mutationFn: async (messageContent) => {
+    //         await base44.entities.ChatMessage.create({
+    //             conversa_id: conversaId,
+    //             remetente_id: 'admin',
+    //             remetente_nome: adminUser?.full_name || 'Admin',
+    //             conteudo: messageContent,
+    //         });
 
-            await base44.entities.ChatConversa.update(conversaId, {
-                last_message_preview: messageContent,
-                last_message_date: new Date().toISOString(),
-                unread_user: true,
-                unread_admin: false, 
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['chatMessages', conversaId] });
-            queryClient.invalidateQueries({ queryKey: ['openChatsAdmin'] });
-            setNewMessage('');
-        },
-    });
+    //         await base44.entities.ChatConversa.update(conversaId, {
+    //             last_message_preview: messageContent,
+    //             last_message_date: new Date().toISOString(),
+    //             unread_user: true,
+    //             unread_admin: false, 
+    //         });
+    //     },
+    //     onSuccess: () => {
+    //         queryClient.invalidateQueries({ queryKey: ['chatMessages', conversaId] });
+    //         queryClient.invalidateQueries({ queryKey: ['openChatsAdmin'] });
+    //         setNewMessage('');
+    //     },
+    // });
+    const sendMessageMutation = { mutate: () => {}, isPending: false };
 
     const handleSendMessage = (e) => {
         e.preventDefault();

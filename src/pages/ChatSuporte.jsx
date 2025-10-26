@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,59 +19,67 @@ export default function ChatSuporte() {
   const [novaMensagem, setNovaMensagem] = useState("");
   const chatEndRef = useRef(null);
 
-  const { data: user, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  // const { data: user, isLoading: isLoadingUser } = useQuery({
+  //   queryKey: ['user'],
+  //   queryFn: () => base44.auth.me(),
+  // });
+  const user = null;
+  const isLoadingUser = false;
 
-  const { data: conversaAberta, isLoading: isLoadingConversa } = useQuery({
-    queryKey: ['conversaAberta', user?.id],
-    queryFn: async () => {
-      const conversas = await base44.entities.ChatConversa.filter({
-        usuario_id: user.id,
-        status: 'aberto'
-      }, '-created_date', 1);
-      return conversas[0] || null;
-    },
-    enabled: !!user,
-    onSuccess: (data) => {
-      if (data) {
-        setConversa(data);
-      }
-    }
-  });
+  // const { data: conversaAberta, isLoading: isLoadingConversa } = useQuery({
+  //   queryKey: ['conversaAberta', user?.id],
+  //   queryFn: async () => {
+  //     const conversas = await base44.entities.ChatConversa.filter({
+  //       usuario_id: user.id,
+  //       status: 'aberto'
+  //     }, '-created_date', 1);
+  //     return conversas[0] || null;
+  //   },
+  //   enabled: !!user,
+  //   onSuccess: (data) => {
+  //     if (data) {
+  //       setConversa(data);
+  //     }
+  //   }
+  // });
+  const conversaAberta = null;
+  const isLoadingConversa = false;
 
-  const { data: mensagens, isLoading: isLoadingMensagens } = useQuery({
-    queryKey: ['mensagens', conversa?.id],
-    queryFn: () => base44.entities.ChatMessage.filter({ conversa_id: conversa.id }, 'created_date'),
-    enabled: !!conversa,
-    refetchInterval: 5000, // Check for new messages every 5 seconds
-  });
+  // const { data: mensagens, isLoading: isLoadingMensagens } = useQuery({
+  //   queryKey: ['mensagens', conversa?.id],
+  //   queryFn: () => base44.entities.ChatMessage.filter({ conversa_id: conversa.id }, 'created_date'),
+  //   enabled: !!conversa,
+  //   refetchInterval: 5000,
+  // });
+  const mensagens = [];
+  const isLoadingMensagens = false;
 
-  const criarConversaMutation = useMutation({
-    mutationFn: async (data) => {
-      const novaConversa = await base44.entities.ChatConversa.create(data.conversa);
-      await base44.entities.ChatMessage.create({ ...data.mensagem, conversa_id: novaConversa.id });
-      return novaConversa;
-    },
-    onSuccess: (data) => {
-      setConversa(data);
-      setAssunto("");
-      setNovaMensagem("");
-      queryClient.invalidateQueries({ queryKey: ['conversaAberta'] });
-    },
-  });
+  // const criarConversaMutation = useMutation({
+  //   mutationFn: async (data) => {
+  //     const novaConversa = await base44.entities.ChatConversa.create(data.conversa);
+  //     await base44.entities.ChatMessage.create({ ...data.mensagem, conversa_id: novaConversa.id });
+  //     return novaConversa;
+  //   },
+  //   onSuccess: (data) => {
+  //     setConversa(data);
+  //     setAssunto("");
+  //     setNovaMensagem("");
+  //     queryClient.invalidateQueries({ queryKey: ['conversaAberta'] });
+  //   },
+  // });
+  const criarConversaMutation = { mutate: () => {}, isPending: false };
 
-  const enviarMensagemMutation = useMutation({
-    mutationFn: async (data) => {
-      await base44.entities.ChatMessage.create(data.mensagem);
-      await base44.entities.ChatConversa.update(conversa.id, data.updateConversa);
-    },
-    onSuccess: () => {
-      setNovaMensagem("");
-      queryClient.invalidateQueries({ queryKey: ['mensagens', conversa?.id] });
-    },
-  });
+  // const enviarMensagemMutation = useMutation({
+  //   mutationFn: async (data) => {
+  //     await base44.entities.ChatMessage.create(data.mensagem);
+  //     await base44.entities.ChatConversa.update(conversa.id, data.updateConversa);
+  //   },
+  //   onSuccess: () => {
+  //     setNovaMensagem("");
+  //     queryClient.invalidateQueries({ queryKey: ['mensagens', conversa?.id] });
+  //   },
+  // });
+  const enviarMensagemMutation = { mutate: () => {}, isPending: false };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });

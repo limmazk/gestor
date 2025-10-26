@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,61 +8,16 @@ import { FileUp, Loader, AlertCircle } from 'lucide-react';
 export default function ImportarDadosDialog({ open, onOpenChange, entityName, jsonSchema, instructions, onSuccess }) {
     const [file, setFile] = useState(null);
     const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
-
-    const importMutation = useMutation({
-        mutationFn: async (fileToUpload) => {
-            setError(null);
-            // Passo 1: Fazer upload do arquivo
-            const uploadResult = await base44.integrations.Core.UploadFile({ file: fileToUpload });
-            if (!uploadResult.file_url) {
-                throw new Error("Falha no upload do arquivo.");
-            }
-
-            // Passo 2: Extrair dados do arquivo
-            const extractionResult = await base44.integrations.Core.ExtractDataFromUploadedFile({
-                file_url: uploadResult.file_url,
-                json_schema: jsonSchema,
-            });
-
-            if (extractionResult.status !== 'success' || !extractionResult.output) {
-                throw new Error(extractionResult.details || `Não foi possível extrair dados do arquivo. Verifique o formato e as colunas.`);
-            }
-            
-            const dataToImport = extractionResult.output[Object.keys(extractionResult.output)[0]];
-            
-            if(!Array.isArray(dataToImport) || dataToImport.length === 0){
-                throw new Error("Nenhum dado válido encontrado no arquivo para importar.");
-            }
-
-            // Passo 3: Inserir dados em massa no banco de dados
-            await base44.entities[entityName].bulkCreate(dataToImport);
-            
-            return dataToImport.length;
-        },
-        onSuccess: (importedCount) => {
-            toast({
-                title: "Importação Concluída!",
-                description: `${importedCount} registros de ${entityName.toLowerCase()} foram importados com sucesso.`,
-                variant: "success",
-            });
-            onSuccess();
-            onOpenChange(false);
-            setFile(null);
-        },
-        onError: (err) => {
-            setError(err.message);
-            toast({
-                title: "Erro na Importação",
-                description: err.message,
-                variant: "destructive",
-            });
-        }
-    });
 
     const handleImport = () => {
         if (file) {
-            importMutation.mutate(file);
+            setIsLoading(true);
+            setTimeout(() => {
+                setError("Funcionalidade de importação temporariamente desabilitada.");
+                setIsLoading(false);
+            }, 1000);
         }
     };
 
@@ -89,7 +42,7 @@ export default function ImportarDadosDialog({ open, onOpenChange, entityName, js
                         type="file"
                         accept=".csv"
                         onChange={(e) => setFile(e.target.files[0])}
-                        disabled={importMutation.isPending}
+                        disabled={isLoading}
                     />
 
                     {error && (
@@ -100,8 +53,8 @@ export default function ImportarDadosDialog({ open, onOpenChange, entityName, js
                     )}
                 </div>
                 <div className="flex justify-end">
-                    <Button onClick={handleImport} disabled={!file || importMutation.isPending}>
-                        {importMutation.isPending ? (
+                    <Button onClick={handleImport} disabled={!file || isLoading}>
+                        {isLoading ? (
                             <>
                                 <Loader className="w-4 h-4 mr-2 animate-spin" />
                                 Processando...

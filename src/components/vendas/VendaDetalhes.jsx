@@ -1,6 +1,4 @@
 import React from 'react';
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, CreditCard, Package } from "lucide-react";
@@ -8,11 +6,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function VendaDetalhes({ venda }) {
-  const { data: parcelas = [] } = useQuery({
-    queryKey: ['parcelas-venda', venda.id],
-    queryFn: () => base44.entities.Parcela.filter({ venda_id: venda.id }),
-    initialData: [],
-  });
+  const parcelas = [];
 
   return (
     <div className="space-y-6">

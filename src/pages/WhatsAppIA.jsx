@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,23 +35,8 @@ export default function WhatsAppIA() {
   const [qrCode, setQrCode] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { data: configs, isLoading: isLoadingConfigs } = useQuery({
-    queryKey: ['configs-whatsapp'],
-    queryFn: async () => {
-      const results = await base44.entities.Configuracao.filter({ 
-        $or: [
-          { chave: 'WHATSAPP_API_URL' },
-          { chave: 'WHATSAPP_API_KEY' },
-        ]
-      });
-      const configsMap = results.reduce((acc, config) => {
-        acc[config.chave] = config.valor;
-        return acc;
-      }, {});
-      return configsMap;
-    },
-    initialData: {}
-  });
+  const configs = {};
+  const isLoadingConfigs = false;
 
   const apiUrl = configs.WHATSAPP_API_URL;
   const apiKey = configs.WHATSAPP_API_KEY;

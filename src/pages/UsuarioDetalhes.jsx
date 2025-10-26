@@ -1,7 +1,6 @@
 
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -34,26 +33,31 @@ export default function UsuarioDetalhes() {
     const urlParams = new URLSearchParams(window.location.search);
     const userEmail = urlParams.get('email');
 
-    const { data: usuarioData, isLoading: isLoadingUser, error: errorUser } = useQuery({
-        queryKey: ['usuarioDetalhes', userEmail],
-        queryFn: () => base44.entities.User.filter({ email: userEmail }),
-        enabled: !!userEmail,
-    });
+    // const { data: usuarioData, isLoading: isLoadingUser, error: errorUser } = useQuery({
+    //     queryKey: ['usuarioDetalhes', userEmail],
+    //     queryFn: () => base44.entities.User.filter({ email: userEmail }),
+    //     enabled: !!userEmail,
+    // });
+    const usuarioData = [];
+    const isLoadingUser = false;
+    const errorUser = null;
 
-    const { data: dadosRelacionados, isLoading: isLoadingRelated } = useQuery({
-        queryKey: ['dadosRelacionados', userEmail],
-        queryFn: async () => {
-            if (!userEmail) return null;
-            const user = (await base44.entities.User.filter({ email: userEmail }))[0];
-            if (!user) return { clientes: [], vendas: [], pagamentos: [] };
+    // const { data: dadosRelacionados, isLoading: isLoadingRelated } = useQuery({
+    //     queryKey: ['dadosRelacionados', userEmail],
+    //     queryFn: async () => {
+    //         if (!userEmail) return null;
+    //         const user = (await base44.entities.User.filter({ email: userEmail }))[0];
+    //         if (!user) return { clientes: [], vendas: [], pagamentos: [] };
             
-            const clientes = await base44.entities.Cliente.filter({ created_by: user.email });
-            const vendas = await base44.entities.Venda.filter({ created_by: user.email });
-            const pagamentos = await base44.entities.Pagamento.filter({ empresa_id: user.id });
-            return { clientes, vendas, pagamentos };
-        },
-        enabled: !!userEmail,
-    });
+    //         const clientes = await base44.entities.Cliente.filter({ created_by: user.email });
+    //         const vendas = await base44.entities.Venda.filter({ created_by: user.email });
+    //         const pagamentos = await base44.entities.Pagamento.filter({ empresa_id: user.id });
+    //         return { clientes, vendas, pagamentos };
+    //     },
+    //     enabled: !!userEmail,
+    // });
+    const dadosRelacionados = { clientes: [], vendas: [], pagamentos: [] };
+    const isLoadingRelated = false;
 
     const produtosVendidos = useMemo(() => {
         if (!dadosRelacionados?.vendas) return [];

@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,55 +57,54 @@ export default function Clientes() {
   const [editingClient, setEditingClient] = useState(null);
   const [isImportOpen, setIsImportOpen] = useState(false);
 
-  // Busca de dados usando React Query
-  const { data: clients = [], isLoading } = useQuery({
-    queryKey: ['clientes', query],
-    queryFn: () => {
-        const q = query.toLowerCase();
-        if (!q) return base44.entities.Cliente.list('-created_date');
+  // const { data: clients = [], isLoading } = useQuery({
+  //   queryKey: ['clientes', query],
+  //   queryFn: () => {
+  //       const q = query.toLowerCase();
+  //       if (!q) return base44.entities.Cliente.list('-created_date');
         
-        // Simula uma busca simples no lado do cliente por simplicidade. 
-        // Idealmente, seria um filtro no backend.
-        return base44.entities.Cliente.list().then(allClients => 
-            allClients.filter(c => 
-                (c.name && c.name.toLowerCase().includes(q)) ||
-                (c.email && c.email.toLowerCase().includes(q)) ||
-                (c.phone && c.phone.toLowerCase().includes(q)) ||
-                (c.cpf_cnpj && c.cpf_cnpj.toLowerCase().includes(q))
-            )
-        );
-    },
-    initialData: []
-  });
+  //       return base44.entities.Cliente.list().then(allClients => 
+  //           allClients.filter(c => 
+  //               (c.name && c.name.toLowerCase().includes(q)) ||
+  //               (c.email && c.email.toLowerCase().includes(q)) ||
+  //               (c.phone && c.phone.toLowerCase().includes(q)) ||
+  //               (c.cpf_cnpj && c.cpf_cnpj.toLowerCase().includes(q))
+  //           )
+  //       );
+  //   },
+  //   initialData: []
+  // });
+  const clients = [];
+  const isLoading = false;
 
-  // Mutação para criar cliente
-  const createClientMutation = useMutation({
-    mutationFn: (newClient) => base44.entities.Cliente.create(newClient),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clientes'] });
-      queryClient.invalidateQueries({ queryKey: ['allClientes'] }); // Invalida a query do Dashboard
-      toast({
-        title: "Sucesso!",
-        description: `Cliente "${form.name}" adicionado.`,
-        variant: "success",
-      });
-      setForm({ name: '', email: '', phone: '', cpf_cnpj: '', endereco: '', limite_crediario: '', data_nascimento: '' });
-    },
-    onError: (error) => toast({ title: "Erro", description: error.message, variant: "destructive" })
-  });
+  // const createClientMutation = useMutation({
+  //   mutationFn: (newClient) => base44.entities.Cliente.create(newClient),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['clientes'] });
+  //     queryClient.invalidateQueries({ queryKey: ['allClientes'] });
+  //     toast({
+  //       title: "Sucesso!",
+  //       description: `Cliente "${form.name}" adicionado.`,
+  //       variant: "success",
+  //     });
+  //     setForm({ name: '', email: '', phone: '', cpf_cnpj: '', endereco: '', limite_crediario: '', data_nascimento: '' });
+  //   },
+  //   onError: (error) => toast({ title: "Erro", description: error.message, variant: "destructive" })
+  // });
+  const createClientMutation = { mutate: () => {}, isPending: false };
 
-  // Mutação para atualizar cliente
-  const updateClientMutation = useMutation({
-    mutationFn: (updatedClient) => base44.entities.Cliente.update(updatedClient.id, updatedClient),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clientes'] });
-      queryClient.invalidateQueries({ queryKey: ['allClientes'] }); // Invalida a query do Dashboard
-      toast({ title: "Sucesso!", description: "Cliente atualizado com sucesso.", variant: "success" });
-      setIsEditModalOpen(false);
-      setEditingClient(null);
-    },
-    onError: (error) => toast({ title: "Erro", description: error.message, variant: "destructive" })
-  });
+  // const updateClientMutation = useMutation({
+  //   mutationFn: (updatedClient) => base44.entities.Cliente.update(updatedClient.id, updatedClient),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['clientes'] });
+  //     queryClient.invalidateQueries({ queryKey: ['allClientes'] });
+  //     toast({ title: "Sucesso!", description: "Cliente atualizado com sucesso.", variant: "success" });
+  //     setIsEditModalOpen(false);
+  //     setEditingClient(null);
+  //   },
+  //   onError: (error) => toast({ title: "Erro", description: error.message, variant: "destructive" })
+  // });
+  const updateClientMutation = { mutate: () => {}, isPending: false };
 
 
   function handleAdd(e) {

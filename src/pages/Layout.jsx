@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
-import { base44 } from "@/api/base44Client";
 import BloqueioMensalidade from "@/components/BloqueioMensalidade";
 import TermosDeUsoModal from "@/components/auth/TermosDeUsoModal";
 import { format, formatDistanceToNow } from "date-fns";
@@ -69,20 +68,20 @@ export default function Layout({ children, currentPageName, onLogout }) {
   const [hasNewNotifications, setHasNewNotifications] = useState(false); // NOVO ESTADO
   const prevNotifCount = useRef(0);
 
-  // Busca de dados para notificações (APENAS PARA ADMINS)
-  const { data: notificationData } = useQuery({
-    queryKey: ['adminNotifications'],
-    queryFn: async () => {
-      const [pagamentos, tickets, chats] = await Promise.all([
-        base44.entities.Pagamento.filter({ status: 'aguardando_verificacao' }),
-        base44.entities.SuporteTicket.filter({ status: 'aberto' }),
-        base44.entities.ChatConversa.filter({ status: 'aberto', unread_admin: true }),
-      ]);
-      return { pagamentos, tickets, chats };
-    },
-    enabled: isAdmin,
-    refetchInterval: 15000, // Verifica a cada 15 segundos
-  });
+  // const { data: notificationData } = useQuery({
+  //   queryKey: ['adminNotifications'],
+  //   queryFn: async () => {
+  //     const [pagamentos, tickets, chats] = await Promise.all([
+  //       base44.entities.Pagamento.filter({ status: 'aguardando_verificacao' }),
+  //       base44.entities.SuporteTicket.filter({ status: 'aberto' }),
+  //       base44.entities.ChatConversa.filter({ status: 'aberto', unread_admin: true }),
+  //     ]);
+  //     return { pagamentos, tickets, chats };
+  //   },
+  //   enabled: isAdmin,
+  //   refetchInterval: 15000,
+  // });
+  const notificationData = null;
 
   // Processa os dados e dispara alertas
   useEffect(() => {

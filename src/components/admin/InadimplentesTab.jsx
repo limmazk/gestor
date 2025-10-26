@@ -1,21 +1,12 @@
 import React, { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { UserX, Mail, Phone, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function InadimplentesTab() {
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['allUsersAdmin'],
-    queryFn: () => base44.entities.User.list(),
-  });
-
-  const { data: allPayments = [] } = useQuery({
-    queryKey: ['allPaymentsAdmin'],
-    queryFn: () => base44.entities.Pagamento.list(),
-  });
+  const allUsers = [];
+  const allPayments = [];
 
   const inadimplentes = useMemo(() => {
     const hoje = new Date();

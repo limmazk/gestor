@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,60 +16,61 @@ export default function Vendas() {
   const [cart, setCart] = useState([]);
   const [barcodeSearch, setBarcodeSearch] = useState('');
 
-  const { data: clients = [] } = useQuery({
-    queryKey: ['clientesParaVenda', clientQuery],
-    queryFn: () => {
-      if (!clientQuery) return base44.entities.Cliente.list(null, 20); // Limita a 20 se busca vazia
-      return base44.entities.Cliente.filter({ name: { contains: clientQuery } });
-    }
-  });
+  // const { data: clients = [] } = useQuery({
+  //   queryKey: ['clientesParaVenda', clientQuery],
+  //   queryFn: () => {
+  //     if (!clientQuery) return base44.entities.Cliente.list(null, 20);
+  //     return base44.entities.Cliente.filter({ name: { contains: clientQuery } });
+  //   }
+  // });
+  const clients = [];
 
-  const { data: products = [] } = useQuery({
-    queryKey: ['produtosParaVenda'],
-    queryFn: () => base44.entities.Produto.list()
-  });
+  // const { data: products = [] } = useQuery({
+  //   queryKey: ['produtosParaVenda'],
+  //   queryFn: () => base44.entities.Produto.list()
+  // });
+  const products = [];
 
-  const addSaleMutation = useMutation({
-    mutationFn: (newSale) => base44.entities.Venda.create(newSale),
-    onSuccess: async (data) => {
-      // Atualiza o estoque dos produtos vendidos
-      const stockUpdatePromises = data.itens.map(item => {
-        const product = products.find(p => p.id === item.produto_id);
-        if (product && typeof product.quantidade_estoque === 'number') {
-          return base44.entities.Produto.update(product.id, {
-            quantidade_estoque: product.quantidade_estoque - item.quantidade
-          });
-        }
-        return Promise.resolve();
-      });
+  // const addSaleMutation = useMutation({
+  //   mutationFn: (newSale) => base44.entities.Venda.create(newSale),
+  //   onSuccess: async (data) => {
+  //     const stockUpdatePromises = data.itens.map(item => {
+  //       const product = products.find(p => p.id === item.produto_id);
+  //       if (product && typeof product.quantidade_estoque === 'number') {
+  //         return base44.entities.Produto.update(product.id, {
+  //           quantidade_estoque: product.quantidade_estoque - item.quantidade
+  //         });
+  //       }
+  //       return Promise.resolve();
+  //     });
 
-      await Promise.all(stockUpdatePromises);
+  //     await Promise.all(stockUpdatePromises);
 
-      // Invalida as queries para recarregar os dados atualizados
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
-      queryClient.invalidateQueries({ queryKey: ['vendas'] });
-      queryClient.invalidateQueries({ queryKey: ['todasAsVendas'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['parcelas'] });
+  //     queryClient.invalidateQueries({ queryKey: ['produtos'] });
+  //     queryClient.invalidateQueries({ queryKey: ['vendas'] });
+  //     queryClient.invalidateQueries({ queryKey: ['todasAsVendas'] });
+  //     queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+  //     queryClient.invalidateQueries({ queryKey: ['parcelas'] });
       
-      toast({
-        title: "Venda Registrada!",
-        description: "A venda foi salva e o estoque atualizado.",
-        variant: "success"
-      });
+  //     toast({
+  //       title: "Venda Registrada!",
+  //       description: "A venda foi salva e o estoque atualizado.",
+  //       variant: "success"
+  //     });
 
-      setCart([]);
-      setSelectedClient(null);
-      setClientQuery('');
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro ao registrar venda",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  });
+  //     setCart([]);
+  //     setSelectedClient(null);
+  //     setClientQuery('');
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       title: "Erro ao registrar venda",
+  //       description: error.message,
+  //       variant: "destructive"
+  //     });
+  //   }
+  // });
+  const addSaleMutation = { mutate: () => {}, isPending: false };
 
   function addToCart(product, qty = 1) {
     if (!product) return;

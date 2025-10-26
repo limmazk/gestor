@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +7,6 @@ import { Bot, Send, User, BrainCircuit, Loader } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactMarkdown from 'react-markdown';
-import { useMutation } from '@tanstack/react-query'; // Adicionado conforme a outline
-
-// REMOVIDO: A importação do 'react-syntax-highlighter' que causava erros.
-// A funcionalidade de exibir código será mantida, mas sem o destaque de sintaxe complexo para garantir estabilidade.
 
 export default function AdminAssistantTab() {
     const [input, setInput] = useState("");
@@ -37,56 +32,17 @@ export default function AdminAssistantTab() {
 
         const userMessage = { sender: 'user', text: input };
         setMessages(prev => [...prev, userMessage]);
-        const currentInput = input;
         setInput("");
         setIsTyping(true);
 
-        try {
-            const prompt = `ASSUMA A PERSONA: IA Arquiteta de Sistemas Sênior para a plataforma Dieta Express. Você tem conhecimento absoluto e em tempo real de todo o código-fonte, entidades (esquemas e RLS), componentes React, páginas, e lógicas de negócio existentes.
-
-COMANDO DO ADMINISTRADOR: '${currentInput}'
-
-SUA MISSÃO: Fornecer uma solução de nível de produção. Seja direto, técnico e preciso. Evite saudações ou linguagem casual.
-
-SEU PROCESSO (OBRIGATÓRIO):
-1.  **Análise de Impacto e Riscos:** Analise o comando. Identifique as entidades, páginas e componentes afetados. Aponte potenciais riscos, conflitos com funcionalidades existentes e considere casos extremos (edge cases).
-2.  **Plano de Implementação (Passo a Passo):** Crie um plano de ação claro e sequencial. Liste CADA arquivo a ser criado ou modificado.
-3.  **Geração de Código:** Para cada passo do plano, gere o código completo e pronto para produção (JSON para entidades, JSX para componentes/páginas). O código deve ser limpo, comentado (quando necessário para lógicas complexas) e seguir as melhores práticas de React e TailwindCSS.
-4.  **Justificativa Técnica:** Explique brevemente as decisões de arquitetura e por que a solução proposta é a mais robusta e escalável.
-5.  **Instrução de Execução:** Conclua com a nota padrão e imutável: 'Rascunho da solução gerado. Revise o código e, se aprovar, me dê o comando de execução no chat principal para que eu possa aplicar as alterações de forma definitiva e correta no sistema.'`;
-            
-            const responseText = await base44.integrations.Core.InvokeLLM({ 
-                prompt,
-                add_context_from_internet: true 
-            });
-            
+        setTimeout(() => {
             const aiResponse = {
                 sender: 'ai',
-                text: responseText,
+                text: "Funcionalidade de IA temporariamente desabilitada. Aguarde atualizações.",
             };
-
             setMessages(prev => [...prev, aiResponse]);
-            toast({
-                title: "Analise e Solucao Gerada!",
-                description: "Revise o plano e o codigo abaixo. Se aprovar, me de a ordem de execucao no chat principal.",
-                variant: "success",
-            });
-
-        } catch (error) {
-            console.error("Erro ao chamar a IA:", error);
-            const errorResponse = {
-                sender: 'ai',
-                text: "Desculpe, tive um problema ao processar sua solicitacao. Por favor, tente novamente."
-            };
-            setMessages(prev => [...prev, errorResponse]);
-             toast({
-                title: "Erro de Comunicacao com a IA",
-                description: "Nao foi possivel gerar uma resposta. Verifique o console para mais detalhes.",
-                variant: "destructive",
-            });
-        } finally {
             setIsTyping(false);
-        }
+        }, 1000);
     };
 
     return (

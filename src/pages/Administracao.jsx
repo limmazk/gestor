@@ -1,6 +1,5 @@
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,10 +58,12 @@ function useDebounce(value, delay) {
 }
 
 export default function Administracao() {
-  const { data: user, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-  });
+  // const { data: user, isLoading: isLoadingUser } = useQuery({
+  //   queryKey: ['user'],
+  //   queryFn: () => base44.auth.me(),
+  // });
+  const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isLoadingUser = false;
 
   const { toast } = useToast();
   const location = useLocation();
@@ -88,42 +89,52 @@ export default function Administracao() {
     }
   }, [location.search]);
 
-  // Queries para dados das abas
-  const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
-    queryKey: ['allUsersAdmin', debouncedBusca],
-    queryFn: () => debouncedBusca ? base44.entities.User.filter({ full_name: { contains: debouncedBusca }}) : base44.entities.User.list(),
-    enabled: isAdmin,
-  });
+  // const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
+  //   queryKey: ['allUsersAdmin', debouncedBusca],
+  //   queryFn: () => debouncedBusca ? base44.entities.User.filter({ full_name: { contains: debouncedBusca }}) : base44.entities.User.list(),
+  //   enabled: isAdmin,
+  // });
+  const allUsers = [];
+  const isLoadingUsers = false;
 
-  const { data: pagamentosPendentes = [], isLoading: isLoadingPagamentos } = useQuery({
-    queryKey: ['pagamentosPendentesAdmin'],
-    queryFn: () => base44.entities.Pagamento.filter({ status: 'aguardando_verificacao' }, '-created_date'),
-    enabled: isAdmin,
-  });
+  // const { data: pagamentosPendentes = [], isLoading: isLoadingPagamentos } = useQuery({
+  //   queryKey: ['pagamentosPendentesAdmin'],
+  //   queryFn: () => base44.entities.Pagamento.filter({ status: 'aguardando_verificacao' }, '-created_date'),
+  //   enabled: isAdmin,
+  // });
+  const pagamentosPendentes = [];
+  const isLoadingPagamentos = false;
 
-  const { data: openTickets = [], isLoading: isLoadingTickets } = useQuery({
-    queryKey: ['openTicketsAdmin'],
-    queryFn: () => base44.entities.SuporteTicket.filter({ status: 'aberto' }, '-created_date'),
-    enabled: isAdmin,
-  });
+  // const { data: openTickets = [], isLoading: isLoadingTickets } = useQuery({
+  //   queryKey: ['openTicketsAdmin'],
+  //   queryFn: () => base44.entities.SuporteTicket.filter({ status: 'aberto' }, '-created_date'),
+  //   enabled: isAdmin,
+  // });
+  const openTickets = [];
+  const isLoadingTickets = false;
 
-  const { data: openChats = [], isLoading: isLoadingChats } = useQuery({
-    queryKey: ['openChatsAdmin'],
-    queryFn: () => base44.entities.ChatConversa.filter({ status: 'aberto' }, '-last_message_date'),
-    enabled: isAdmin,
-  });
+  // const { data: openChats = [], isLoading: isLoadingChats } = useQuery({
+  //   queryKey: ['openChatsAdmin'],
+  //   queryFn: () => base44.entities.ChatConversa.filter({ status: 'aberto' }, '-last_message_date'),
+  //   enabled: isAdmin,
+  // });
+  const openChats = [];
+  const isLoadingChats = false;
 
-  const { data: initialSystemConfigs = [], isLoading: isLoadingSystemConfigs } = useQuery({
-    queryKey: ['allSystemConfigs'],
-    queryFn: () => base44.entities.Configuracao.list(),
-    enabled: isAdmin,
-  });
+  // const { data: initialSystemConfigs = [], isLoading: isLoadingSystemConfigs } = useQuery({
+  //   queryKey: ['allSystemConfigs'],
+  //   queryFn: () => base44.entities.Configuracao.list(),
+  //   enabled: isAdmin,
+  // });
+  const initialSystemConfigs = [];
+  const isLoadingSystemConfigs = false;
   
-  const { data: initialPublicConfigs = [] } = useQuery({
-    queryKey: ['configuracoesPublicas'],
-    queryFn: () => base44.entities.ConfiguracaoPublica.list(),
-    enabled: isAdmin,
-  });
+  // const { data: initialPublicConfigs = [] } = useQuery({
+  //   queryKey: ['configuracoesPublicas'],
+  //   queryFn: () => base44.entities.ConfiguracaoPublica.list(),
+  //   enabled: isAdmin,
+  // });
+  const initialPublicConfigs = [];
 
   useEffect(() => {
     const configsMap = {};
@@ -144,62 +155,64 @@ export default function Administracao() {
   const openTicketsCount = openTickets.length;
   const unreadChatsCount = openChats.filter(c => c.unread_admin).length;
 
-  // Mutações
-  const updatePagamentoMutation = useMutation({
-    mutationFn: ({ id, status, observacoes }) => base44.entities.Pagamento.update(id, { status, observacoes, verificado_por: user.email, data_verificacao: new Date().toISOString() }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentosPendentesAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['adminNotifications'] });
-      // Atualiza o status do usuário se o pagamento for aprovado
-      if(data.status === 'aprovado') {
-          base44.entities.User.update(data.empresa_id, { status: 'ativo' });
-          queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
-      }
-      setIsComprovanteOpen(false);
-      toast({ title: `Pagamento ${data.status}`, description: `O pagamento de ${data.empresa_nome} foi atualizado.` });
-    },
-  });
+  // const updatePagamentoMutation = useMutation({
+  //   mutationFn: ({ id, status, observacoes }) => base44.entities.Pagamento.update(id, { status, observacoes, verificado_por: user.email, data_verificacao: new Date().toISOString() }),
+  //   onSuccess: (data) => {
+  //     queryClient.invalidateQueries({ queryKey: ['pagamentosPendentesAdmin'] });
+  //     queryClient.invalidateQueries({ queryKey: ['adminNotifications'] });
+  //     if(data.status === 'aprovado') {
+  //         base44.entities.User.update(data.empresa_id, { status: 'ativo' });
+  //         queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+  //     }
+  //     setIsComprovanteOpen(false);
+  //     toast({ title: `Pagamento ${data.status}`, description: `O pagamento de ${data.empresa_nome} foi atualizado.` });
+  //   },
+  // });
+  const updatePagamentoMutation = { mutate: () => {}, isPending: false };
 
-  const resolveTicketMutation = useMutation({
-    mutationFn: ({ id, resposta }) => base44.entities.SuporteTicket.update(id, { status: 'resolvido', resposta, resolvido_por: user.email, data_resolucao: new Date().toISOString() }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['openTicketsAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['adminNotifications'] });
-      setIsTicketOpen(false);
-      setTicketResponse("");
-      toast({ title: "Ticket Resolvido!", variant: "success" });
-    },
-  });
+  // const resolveTicketMutation = useMutation({
+  //   mutationFn: ({ id, resposta }) => base44.entities.SuporteTicket.update(id, { status: 'resolvido', resposta, resolvido_por: user.email, data_resolucao: new Date().toISOString() }),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['openTicketsAdmin'] });
+  //     queryClient.invalidateQueries({ queryKey: ['adminNotifications'] });
+  //     setIsTicketOpen(false);
+  //     setTicketResponse("");
+  //     toast({ title: "Ticket Resolvido!", variant: "success" });
+  //   },
+  // });
+  const resolveTicketMutation = { mutate: () => {}, isPending: false };
 
-  const updateConfigMutation = useMutation({
-    mutationFn: ({ id, valor, isPublic }) => {
-      const entity = isPublic ? base44.entities.ConfiguracaoPublica : base44.entities.Configuracao;
-      return entity.update(id, { valor });
-    },
-    onSuccess: () => {
-        toast({ title: "Configuração Salva!", variant: "success" });
-        queryClient.invalidateQueries({ queryKey: ['allSystemConfigs'] });
-        queryClient.invalidateQueries({ queryKey: ['configuracoesPublicas'] });
-    },
-    onError: (err) => {
-        toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
-    }
-  });
+  // const updateConfigMutation = useMutation({
+  //   mutationFn: ({ id, valor, isPublic }) => {
+  //     const entity = isPublic ? base44.entities.ConfiguracaoPublica : base44.entities.Configuracao;
+  //     return entity.update(id, { valor });
+  //   },
+  //   onSuccess: () => {
+  //       toast({ title: "Configuração Salva!", variant: "success" });
+  //       queryClient.invalidateQueries({ queryKey: ['allSystemConfigs'] });
+  //       queryClient.invalidateQueries({ queryKey: ['configuracoesPublicas'] });
+  //   },
+  //   onError: (err) => {
+  //       toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
+  //   }
+  // });
+  const updateConfigMutation = { mutate: () => {}, isPending: false };
 
-  const updateUserMutation = useMutation({
-    mutationFn: ({ userId, data }) => base44.entities.User.update(userId, data),
-    onSuccess: (data, variables) => {
-        queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
-        toast({ 
-            title: "Usuário Atualizado!", 
-            description: `A conta de ${data.full_name} agora é ${variables.data.is_demo_account ? 'uma conta de demonstração.' : 'uma conta padrão.'}`,
-            variant: "success" 
-        });
-    },
-    onError: (err) => {
-        toast({ title: "Erro ao atualizar usuário", description: err.message, variant: "destructive" });
-    }
-  });
+  // const updateUserMutation = useMutation({
+  //   mutationFn: ({ userId, data }) => base44.entities.User.update(userId, data),
+  //   onSuccess: (data, variables) => {
+  //       queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+  //       toast({ 
+  //           title: "Usuário Atualizado!", 
+  //           description: `A conta de ${data.full_name} agora é ${variables.data.is_demo_account ? 'uma conta de demonstração.' : 'uma conta padrão.'}`,
+  //           variant: "success" 
+  //       });
+  //   },
+  //   onError: (err) => {
+  //       toast({ title: "Erro ao atualizar usuário", description: err.message, variant: "destructive" });
+  //   }
+  // });
+  const updateUserMutation = { mutate: () => {}, isPending: false, variables: null };
 
 
   // Handlers

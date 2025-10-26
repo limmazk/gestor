@@ -1,6 +1,5 @@
 
 import React, { useState, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,73 +58,75 @@ export default function Cobrancas() {
   const queryClient = useQueryClient();
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
-    staleTime: Infinity,
-  });
+  // const { data: user } = useQuery({
+  //   queryKey: ['user'],
+  //   queryFn: () => base44.auth.me(),
+  //   staleTime: Infinity,
+  // });
+  const user = null;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['parcelas', page, debouncedSearchTerm, filterStatus, user?.id],
-    queryFn: async () => {
-      const offset = (page - 1) * PAGE_SIZE;
-      const today = startOfDay(new Date());
-      const todayString = format(today, 'yyyy-MM-dd');
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ['parcelas', page, debouncedSearchTerm, filterStatus, user?.id],
+  //   queryFn: async () => {
+  //     const offset = (page - 1) * PAGE_SIZE;
+  //     const today = startOfDay(new Date());
+  //     const todayString = format(today, 'yyyy-MM-dd');
 
-      if (!user?.email) return { parcelas: [], total: 0 };
+  //     if (!user?.email) return { parcelas: [], total: 0 };
 
-      const baseFilter = { created_by: user.email };
-      let filter = { $and: [baseFilter] };
+  //     const baseFilter = { created_by: user.email };
+  //     let filter = { $and: [baseFilter] };
 
-      if (debouncedSearchTerm) {
-        filter.$and.push({
-          $or: [
-            { cliente_nome: { contains: debouncedSearchTerm } },
-            { numero_venda: { contains: debouncedSearchTerm } }
-          ]
-        });
-      }
+  //     if (debouncedSearchTerm) {
+  //       filter.$and.push({
+  //         $or: [
+  //           { cliente_nome: { contains: debouncedSearchTerm } },
+  //           { numero_venda: { contains: debouncedSearchTerm } }
+  //         ]
+  //       });
+  //     }
 
-      if (filterStatus === 'pendente') {
-        filter.$and.push({ status: 'pendente', data_vencimento: { $gt: todayString } });
-      } else if (filterStatus === 'atrasado') {
-        filter.$and.push({ status: 'pendente', data_vencimento: { $lt: todayString } });
-      } else if (filterStatus === 'hoje') {
-        filter.$and.push({ status: 'pendente', data_vencimento: todayString });
-      } else if (filterStatus === 'pagas') {
-        filter.$and.push({ status: 'pago' });
-      }
+  //     if (filterStatus === 'pendente') {
+  //       filter.$and.push({ status: 'pendente', data_vencimento: { $gt: todayString } });
+  //     } else if (filterStatus === 'atrasado') {
+  //       filter.$and.push({ status: 'pendente', data_vencimento: { $lt: todayString } });
+  //     } else if (filterStatus === 'hoje') {
+  //       filter.$and.push({ status: 'pendente', data_vencimento: todayString });
+  //     } else if (filterStatus === 'pagas') {
+  //       filter.$and.push({ status: 'pago' });
+  //     }
 
-      const parcelas = await base44.entities.Parcela.filter(filter, 'data_vencimento', PAGE_SIZE, offset);
-      const total = await base44.entities.Parcela.count(filter);
+  //     const parcelas = await base44.entities.Parcela.filter(filter, 'data_vencimento', PAGE_SIZE, offset);
+  //     const total = await base44.entities.Parcela.count(filter);
 
-      return { parcelas, total };
-    },
-    enabled: !!user,
-    placeholderData: (previousData) => previousData,
-    keepPreviousData: true,
-  });
+  //     return { parcelas, total };
+  //   },
+  //   enabled: !!user,
+  //   placeholderData: (previousData) => previousData,
+  //   keepPreviousData: true,
+  // });
+  const data = { parcelas: [], total: 0 };
+  const isLoading = false;
 
   const parcelasPaginadas = data?.parcelas || [];
   const totalParcelas = data?.total || 0;
   const totalPages = Math.ceil(totalParcelas / PAGE_SIZE);
 
-  const updateParcelaMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Parcela.update(id, data),
-    onSuccess: () => {
-      // OPERAÇÃO COESÃO: SINCRONIZAÇÃO TOTAL
-      // Um pagamento afeta Cobranças, Vendas (status) e o Dashboard.
-      queryClient.invalidateQueries({ queryKey: ['parcelas'] });
-      queryClient.invalidateQueries({ queryKey: ['todasAsParcelasParaStats'] }); // For dashboard stats
-      queryClient.invalidateQueries({ queryKey: ['vendas'] });
-      queryClient.invalidateQueries({ queryKey: ['todasAsVendas'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['allClientes'] });
+  // const updateParcelaMutation = useMutation({
+  //   mutationFn: ({ id, data }) => base44.entities.Parcela.update(id, data),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['parcelas'] });
+  //     queryClient.invalidateQueries({ queryKey: ['todasAsParcelasParaStats'] });
+  //     queryClient.invalidateQueries({ queryKey: ['vendas'] });
+  //     queryClient.invalidateQueries({ queryKey: ['todasAsVendas'] });
+  //     queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+  //     queryClient.invalidateQueries({ queryKey: ['allClientes'] });
       
-      setShowPagarDialog(false);
-      setSelectedParcela(null);
-    },
-  });
+  //     setShowPagarDialog(false);
+  //     setSelectedParcela(null);
+  //   },
+  // });
+  const updateParcelaMutation = { mutateAsync: async () => {}, isPending: false };
 
   const handlePagarParcela = (parcela) => {
     setSelectedParcela(parcela);
@@ -145,15 +146,17 @@ export default function Cobrancas() {
     }
   };
 
-  const { data: allParcelasParaStats = [], isLoading: isLoadingStats } = useQuery({
-    queryKey: ['todasAsParcelasParaStats', user?.id],
-    queryFn: () => {
-      if (!user?.email) return [];
-      return base44.entities.Parcela.filter({ created_by: user.email, status: 'pendente' }, null, 10000); // Fetch all pending parcels
-    },
-    initialData: [],
-    enabled: !!user,
-  });
+  // const { data: allParcelasParaStats = [], isLoading: isLoadingStats } = useQuery({
+  //   queryKey: ['todasAsParcelasParaStats', user?.id],
+  //   queryFn: () => {
+  //     if (!user?.email) return [];
+  //     return base44.entities.Parcela.filter({ created_by: user.email, status: 'pendente' }, null, 10000);
+  //   },
+  //   initialData: [],
+  //   enabled: !!user,
+  // });
+  const allParcelasParaStats = [];
+  const isLoadingStats = false;
 
   const stats = useMemo(() => {
     const hoje = startOfDay(new Date());

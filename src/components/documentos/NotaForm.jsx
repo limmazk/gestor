@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,11 +18,7 @@ export default function NotaForm({ onSubmit, onCancel, isLoading }) {
   const [itens, setItens] = useState([]);
   const [observacoes, setObservacoes] = useState('');
 
-  const { data: vendas = [] } = useQuery({
-    queryKey: ['vendas'],
-    queryFn: () => base44.entities.Venda.list('-created_date'),
-    initialData: [],
-  });
+  const vendas = [];
 
   const handleVendaSelect = (id) => {
     setVendaId(id);

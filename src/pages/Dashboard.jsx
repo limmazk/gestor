@@ -1,6 +1,5 @@
 
 import React, { useMemo, useState } from 'react';
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -30,84 +29,92 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: () => base44.auth.me().catch(() => null),
-  });
+  // const { data: user } = useQuery({
+  //   queryKey: ['user'],
+  //   queryFn: () => base44.auth.me().catch(() => null),
+  // });
+  const user = null;
 
-  const { data: clientes = [], isLoading: isLoadingClientes } = useQuery({
-    queryKey: ['allClientes'],
-    queryFn: () => base44.entities.Cliente.list(),
-    initialData: [],
-  });
+  // const { data: clientes = [], isLoading: isLoadingClientes } = useQuery({
+  //   queryKey: ['allClientes'],
+  //   queryFn: () => base44.entities.Cliente.list(),
+  //   initialData: [],
+  // });
+  const clientes = [];
+  const isLoadingClientes = false;
   
-  const { data: vendas = [], isLoading: isLoadingVendas } = useQuery({
-    queryKey: ['todasAsVendas'],
-    queryFn: () => base44.entities.Venda.list(),
-    initialData: [],
-  });
+  // const { data: vendas = [], isLoading: isLoadingVendas } = useQuery({
+  //   queryKey: ['todasAsVendas'],
+  //   queryFn: () => base44.entities.Venda.list(),
+  //   initialData: [],
+  // });
+  const vendas = [];
+  const isLoadingVendas = false;
 
-  const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery({
-    queryKey: ['produtos'],
-    queryFn: () => base44.entities.Produto.list(),
-    initialData: [],
-  });
+  // const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery({
+  //   queryKey: ['produtos'],
+  //   queryFn: () => base44.entities.Produto.list(),
+  //   initialData: [],
+  // });
+  const produtos = [];
+  const isLoadingProdutos = false;
 
-  const { data: parcelas = [], isLoading: isLoadingParcelas } = useQuery({
-    queryKey: ['todasAsParcelasParaStats'],
-    queryFn: () => base44.entities.Parcela.list(),
-    initialData: [],
-  });
+  // const { data: parcelas = [], isLoading: isLoadingParcelas } = useQuery({
+  //   queryKey: ['todasAsParcelasParaStats'],
+  //   queryFn: () => base44.entities.Parcela.list(),
+  //   initialData: [],
+  // });
+  const parcelas = [];
+  const isLoadingParcelas = false;
 
-  const resetMutation = useMutation({
-    mutationFn: async () => {
-        // OPERAÇÃO DESTRUTIVA MASSIVA
-        const [
-            allClientes, 
-            allProdutos, 
-            allVendas, 
-            allParcelas, 
-            allNotas, 
-            allRecibos
-        ] = await Promise.all([
-            base44.entities.Cliente.list(null, 1000), // Assumindo limite de 1000 para demo
-            base44.entities.Produto.list(null, 1000),
-            base44.entities.Venda.list(null, 1000),
-            base44.entities.Parcela.list(null, 1000),
-            base44.entities.NotaServico.list(null, 1000),
-            base44.entities.Recibo.list(null, 1000)
-        ]);
+  // const resetMutation = useMutation({
+  //   mutationFn: async () => {
+  //       const [
+  //           allClientes, 
+  //           allProdutos, 
+  //           allVendas, 
+  //           allParcelas, 
+  //           allNotas, 
+  //           allRecibos
+  //       ] = await Promise.all([
+  //           base44.entities.Cliente.list(null, 1000),
+  //           base44.entities.Produto.list(null, 1000),
+  //           base44.entities.Venda.list(null, 1000),
+  //           base44.entities.Parcela.list(null, 1000),
+  //           base44.entities.NotaServico.list(null, 1000),
+  //           base44.entities.Recibo.list(null, 1000)
+  //       ]);
 
-        const deletePromises = [
-            ...allClientes.map(c => base44.entities.Cliente.delete(c.id)),
-            ...allProdutos.map(p => base44.entities.Produto.delete(p.id)),
-            ...allVendas.map(v => base44.entities.Venda.delete(v.id)),
-            ...allParcelas.map(pa => base44.entities.Parcela.delete(pa.id)),
-            ...allNotas.map(n => base44.entities.NotaServico.delete(n.id)),
-            ...allRecibos.map(r => base44.entities.Recibo.delete(r.id)),
-        ];
+  //       const deletePromises = [
+  //           ...allClientes.map(c => base44.entities.Cliente.delete(c.id)),
+  //           ...allProdutos.map(p => base44.entities.Produto.delete(p.id)),
+  //           ...allVendas.map(v => base44.entities.Venda.delete(v.id)),
+  //           ...allParcelas.map(pa => base44.entities.Parcela.delete(pa.id)),
+  //           ...allNotas.map(n => base44.entities.NotaServico.delete(n.id)),
+  //           ...allRecibos.map(r => base44.entities.Recibo.delete(r.id)),
+  //       ];
 
-        await Promise.all(deletePromises);
-    },
-    onSuccess: () => {
-        // Invalida todas as queries para recarregar os dados de todo o sistema
-        queryClient.invalidateQueries();
-        toast({
-            title: "Sistema Resetado!",
-            description: "Todos os dados de demonstração foram apagados.",
-            variant: "success",
-        });
-        setIsResetDialogOpen(false);
-    },
-    onError: (error) => {
-        toast({
-            title: "Erro ao Resetar",
-            description: `Não foi possível apagar os dados: ${error.message}`,
-            variant: "destructive",
-        });
-        setIsResetDialogOpen(false);
-    }
-  });
+  //       await Promise.all(deletePromises);
+  //   },
+  //   onSuccess: () => {
+  //       queryClient.invalidateQueries();
+  //       toast({
+  //           title: "Sistema Resetado!",
+  //           description: "Todos os dados de demonstração foram apagados.",
+  //           variant: "success",
+  //       });
+  //       setIsResetDialogOpen(false);
+  //   },
+  //   onError: (error) => {
+  //       toast({
+  //           title: "Erro ao Resetar",
+  //           description: `Não foi possível apagar os dados: ${error.message}`,
+  //           variant: "destructive",
+  //       });
+  //       setIsResetDialogOpen(false);
+  //   }
+  // });
+  const resetMutation = { mutate: () => {}, isPending: false };
 
 
   const stats = useMemo(() => {
